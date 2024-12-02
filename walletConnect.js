@@ -15,19 +15,24 @@ async function connectWallet() {
     try {
         // Request wallet connection
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-        const account = accounts[0];
-        alert(`Wallet connected: ${account}`);
-        
-        // Update UI with connected wallet address
-        document.querySelector('.wallet-connect').textContent = `Connected: ${account.slice(0, 6)}...${account.slice(-4)}`;
+        const userWallet = accounts[0];
+
+        // Initialize user data if not already present
+        let userData = JSON.parse(localStorage.getItem('userData')) || {};
+        if (!userData[userWallet]) {
+            userData[userWallet] = { balance: 1000, staked: 0, rewards: 0 };
+            localStorage.setItem('userData', JSON.stringify(userData));
+            alert('Wallet connected! 1000 xCIS credited to your balance.');
+        } else {
+            alert('Wallet connected! Welcome back.');
+        }
+
+        console.log('Connected wallet:', userWallet);
     } catch (error) {
         console.error('Error connecting wallet:', error);
         alert('Failed to connect wallet. Please try again.');
     }
 }
 
-// Attach event listener to wallet connect button
-document.addEventListener('DOMContentLoaded', () => {
-    const walletButton = document.querySelector('.wallet-connect');
-    walletButton.addEventListener('click', connectWallet);
-});
+// Export functions for use in the application
+export { isWalletAvailable, connectWallet };
