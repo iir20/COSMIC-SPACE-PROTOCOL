@@ -10,89 +10,82 @@ function getUserData() {
 function saveUserData(userData) {
     localStorage.setItem('userData', JSON.stringify(userData));
 }
+document.addEventListener("DOMContentLoaded", () => {
+    const walletConnectBtn = document.querySelectorAll('.wallet-connect');
+    const balanceDisplay = document.querySelectorAll('.balance p');
+    const stakeBtn = document.querySelector("button[innerHTML='Stake']");
+    const stakeInput = document.querySelector("input[placeholder='Enter xCIS Amount']");
+    const stakeList = document.querySelector('.stake-list');
+    const apiOptions = document.getElementsByName("duration");
 
-// Stake xCIS coins
-function stakeCoins(wallet, amount) {
-    const userData = getUserData();
-    const user = userData[wallet];
+    let walletAddress = null;
+    let userBalance = { xCIS: 100, CIS: 0 }; // Default balance for testing.
 
-    if (!user || user.balance < amount) {
-        alert('Insufficient balance to stake.');
-        return;
+    // Wallet connect function
+    walletConnectBtn.forEach(btn => {
+        btn.addEventListener("click", async () => {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            walletAddress = accounts[0];
+            alert(`Wallet Connected: ${walletAddress}`);
+            updateBalanceDisplay();
+        });
+    });
+
+    // Update balance display
+    function updateBalanceDisplay() {
+        balanceDisplay[1].textContent = `xCIS: ${userBalance.xCIS}`;
+        balanceDisplay[2].textContent = `CIS: ${userBalance.CIS}`;
     }
 
-    // Update user data
-    user.balance -= amount;
-    user.staked += amount;
-    user.lastStakeTime = Date.now(); // Record the time of staking
-    saveUserData(userData);
+    // Stake button functionality
+    stakeBtn.addEventListener("click", () => {
+        const stakeAmount = parseInt(stakeInput.value);
+        const selectedDuration = [...apiOptions].find(option => option.checked)?.value;
 
-    alert(`Successfully staked ${amount} xCIS.`);
-    updateUI(wallet);
-}
+        if (!stakeAmount || stakeAmount <= 0) {
+            alert("Please enter a valid xCIS amount.");
+            return;
+        }
 
-// Calculate rewards based on staking duration
-function calculateRewards(wallet) {
-    const userData = getUserData();
-    const user = userData[wallet];
+        if (!selectedDuration) {
+            alert("Please select a staking duration.");
+            return;
+        }
 
-    if (!user || !user.staked || !user.lastStakeTime) {
-        return 0;
-    }
+        if (stakeAmount > userBalance.xCIS) {
+            alert("Insufficient xCIS balance.");
+            return;
+        }
 
-    const currentTime = Date.now();
-    const stakingDuration = currentTime - user.lastStakeTime; // Duration in milliseconds
+        // Deduct staked amount and calculate rewards
+        userBalance.xCIS -= stakeAmount;
+        const rewardMultiplier = {
+            "30": 1.3,
+            "60": 1.6,
+            "90": 1.9,
+            "120": 2.2,
+        };
+        const reward = Math.round(stakeAmount * rewardMultiplier[selectedDuration]);
 
-    // Reward rate: 0.01 xCIS per second per staked xCIS
-    const rewardRate = 0.01;
-    const rewards = (stakingDuration / 1000) * user.staked * rewardRate;
+        // Add to stake list
+        const stakeItem = document.createElement("div");
+        stakeItem.classList.add("stake-item");
+        stakeItem.innerHTML = `
+            ${stakeAmount} xCIS - ${selectedDuration} Days (Reward: ${reward} xCIS)
+            <button class="claim-btn">Claim</button>
+        `;
+        stakeList.appendChild(stakeItem);
 
-    return rewards;
-}
+        // Add claim functionality
+        stakeItem.querySelector(".claim-btn").addEventListener("click", () => {
+            userBalance.xCIS += reward;
+            stakeList.removeChild(stakeItem);
+            updateBalanceDisplay();
+            alert(`Claimed ${reward} xCIS successfully.`);
+        });
 
-// Claim rewards
-function claimRewards(wallet) {
-    const userData = getUserData();
-    const user = userData[wallet];
-
-    if (!user || !user.staked) {
-        alert('No staked coins or rewards available.');
-        return;
-    }
-
-    const rewards = calculateRewards(wallet);
-    user.balance += rewards; // Add rewards to balance
-    user.lastStakeTime = Date.now(); // Reset staking time
-    saveUserData(userData);
-
-    alert(`Successfully claimed ${rewards.toFixed(2)} xCIS rewards.`);
-    updateUI(wallet);
-}
-
-// Update UI with user data
-function updateUI(wallet) {
-    const userData = getUserData();
-    const user = userData[wallet];
-
-    if (user) {
-        document.querySelector('.balance').textContent = `Balance: ${user.balance.toFixed(2)} xCIS`;
-        document.querySelector('.staked').textContent = `Staked: ${user.staked.toFixed(2)} xCIS`;
-        document.querySelector('.rewards').textContent = `Rewards: ${calculateRewards(wallet).toFixed(2)} xCIS`;
-    }
-}
-
-// Event listeners for staking and claiming rewards
-document.querySelector('.stake-btn').addEventListener('click', () => {
-    const wallet = window.ethereum.selectedAddress; // Current wallet
-    const amount = parseFloat(document.querySelector('.stake-input').value);
-    if (isNaN(amount) || amount <= 0) {
-        alert('Enter a valid amount to stake.');
-        return;
-    }
-    stakeCoins(wallet, amount);
+        updateBalanceDisplay();
+        alert(`Staked ${stakeAmount} xCIS for ${selectedDuration} days. Potential reward: ${reward} xCIS.`);
+    });
 });
 
-document.querySelector('.claim-btn').addEventListener('click', () => {
-    const wallet = window.ethereum.selectedAddress; // Current wallet
-    claimRewards(wallet);
-});
