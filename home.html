@@ -10,26 +10,57 @@
     <div class="main-container">
         <header>
             <h1>HOME PAGE</h1>
-            <button class="wallet-connect">Wallet Connect</button>
+            <button class="wallet-connect" id="wallet-connect-btn">Wallet Connect</button>
+            <p class="wallet-address">Wallet: Not Connected</p>
         </header>
         <main>
+            <!-- Balance Section -->
             <section class="balance-section">
                 <h2>BALANCE</h2>
-                <p>xCIS: 00</p>
-                <p>CIS: 00</p>
+                <p class="xcis-balance">xCIS: 00</p>
+                <p class="cis-balance">CIS: 00</p>
             </section>
+
+            <!-- Menu Section -->
             <section class="menu-section">
                 <h2>MENU</h2>
                 <div class="menu-buttons">
                     <button class="menu-btn" onclick="location.href='nft.html'">NFT</button>
                     <button class="menu-btn">UPCOMING</button>
-                    <button class="menu-btn" onclick="location.href='staking.html'">STAKE</button>
+                    <button class="menu-btn" onclick="location.href='#staking-section'">STAKE</button>
                     <button class="menu-btn">UPCOMING</button>
-                    <button class="menu-btn" onclick="location.href='CONVERT.html'">CONVERT</button>
+                    <button class="menu-btn" onclick="location.href='#conversion-section'">CONVERT</button>
                     <button class="menu-btn">UPCOMING</button>
                 </div>
             </section>
+
+            <!-- Staking Section -->
+            <section id="staking-section" class="staking-section">
+                <h2>STAKE YOUR xCIS</h2>
+                <input id="stake-input" type="number" placeholder="Enter xCIS Amount">
+                <div>
+                    <input type="radio" name="duration" value="30" id="duration-30">
+                    <label for="duration-30">30 Days</label>
+                    <input type="radio" name="duration" value="60" id="duration-60">
+                    <label for="duration-60">60 Days</label>
+                    <input type="radio" name="duration" value="90" id="duration-90">
+                    <label for="duration-90">90 Days</label>
+                    <input type="radio" name="duration" value="120" id="duration-120">
+                    <label for="duration-120">120 Days</label>
+                </div>
+                <button id="stake-btn">Stake</button>
+                <div class="stake-list"></div>
+            </section>
+
+            <!-- Conversion Section -->
+            <section id="conversion-section" class="conversion-section">
+                <h2>CONVERT xCIS TO CIS</h2>
+                <input id="convert-input" type="number" placeholder="Enter xCIS Amount to Convert">
+                <button id="convert-btn">Convert</button>
+            </section>
         </main>
     </div>
+    <script src="script.js"></script>
+    <script src="walletConnect.js"></script>
 </body>
 </html>
