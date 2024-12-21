@@ -10,10 +10,43 @@
     <div class="main-container">
         <header>
             <h1>Cosmic Space Protocol</h1>
-            <button class="wallet-connect">Wallet Connect</button>
-          
+            <button class="wallet-connect" id="wallet-connect-btn">Wallet Connect</button>
+            <p class="wallet-address">Wallet: Not Connected</p>
         </header>
+
         <main>
+            <!-- Balance Display -->
+            <div class="balance-display">
+                <p class="xcis-balance">xCIS: 100</p>
+                <p class="cis-balance">CIS: 0</p>
+            </div>
+
+            <!-- Staking Section -->
+            <div class="staking-section">
+                <h2>Stake Your xCIS</h2>
+                <input id="stake-input" type="number" placeholder="Enter xCIS Amount">
+                <div>
+                    <input type="radio" name="duration" value="30" id="duration-30">
+                    <label for="duration-30">30 Days</label>
+                    <input type="radio" name="duration" value="60" id="duration-60">
+                    <label for="duration-60">60 Days</label>
+                    <input type="radio" name="duration" value="90" id="duration-90">
+                    <label for="duration-90">90 Days</label>
+                    <input type="radio" name="duration" value="120" id="duration-120">
+                    <label for="duration-120">120 Days</label>
+                </div>
+                <button id="stake-btn">Stake</button>
+                <div class="stake-list"></div>
+            </div>
+
+            <!-- Conversion Section -->
+            <div class="conversion-section">
+                <h2>Convert xCIS to CIS</h2>
+                <input id="convert-input" type="number" placeholder="Enter xCIS Amount to Convert">
+                <button id="convert-btn">Convert</button>
+            </div>
+
+            <!-- Access Cosmic World -->
             <div class="visa-container">
                 <button class="add-visa">
                     <span>+</span>
@@ -23,41 +56,7 @@
             <button class="access-btn" onclick="location.href='home.html'">Access Cosmic World</button>
         </main>
     </div>
-    <!-- Wallet Connection -->
-<div>
-    <button id="wallet-connect-btn">Connect Wallet</button>
-    <p class="wallet-address">Wallet: Not Connected</p>
-</div>
-
-<!-- Balances -->
-<div>
-    <p class="xcis-balance">xCIS: 100</p>
-    <p class="cis-balance">CIS: 0</p>
-</div>
-
-<!-- Staking Section -->
-<div>
-    <input id="stake-input" type="number" placeholder="Enter xCIS Amount" />
-    <div>
-        <input type="radio" name="duration" value="30" id="duration-30" />
-        <label for="duration-30">30 Days</label>
-        <input type="radio" name="duration" value="60" id="duration-60" />
-        <label for="duration-60">60 Days</label>
-        <input type="radio" name="duration" value="90" id="duration-90" />
-        <label for="duration-90">90 Days</label>
-        <input type="radio" name="duration" value="120" id="duration-120" />
-        <label for="duration-120">120 Days</label>
-    </div>
-    <button id="stake-btn">Stake</button>
-    <div class="stake-list"></div>
-</div>
-
-<!-- Conversion Section -->
-<div>
-    <input id="convert-input" type="number" placeholder="Enter xCIS Amount to Convert" />
-    <button id="convert-btn">Convert</button>
-</div>
     <script src="script.js"></script>
-      <script src="walletConnect.js"></script>
+    <script src="walletConnect.js"></script>
 </body>
 </html>
