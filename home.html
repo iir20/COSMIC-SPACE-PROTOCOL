@@ -25,18 +25,17 @@
             <section class="menu-section">
                 <h2>MENU</h2>
                 <div class="menu-buttons">
-                    <button class="menu-btn" onclick="location.href='nft.html'">NFT</button>
-                    <button class="menu-btn">UPCOMING</button>
-                    <button class="menu-btn" onclick="location.href='#staking-section'">STAKE</button>
-                    <button class="menu-btn">UPCOMING</button>
-                    <button class="menu-btn" onclick="location.href='#conversion-section'">CONVERT</button>
-                    <button class="menu-btn">UPCOMING</button>
+                    <button class="menu-btn" id="staking-btn">STAKE</button>
+                    <button class="menu-btn" id="convert-btn">CONVERT</button>
                 </div>
             </section>
+        </main>
 
-            <!-- Staking Section -->
-            <section id="staking-section" class="staking-section">
-                <h2>STAKE YOUR xCIS</h2>
+        <!-- Modal for Staking -->
+        <div id="staking-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-staking">&times;</span>
+                <h2>Stake Your xCIS</h2>
                 <input id="stake-input" type="number" placeholder="Enter xCIS Amount">
                 <div>
                     <input type="radio" name="duration" value="30" id="duration-30">
@@ -48,17 +47,19 @@
                     <input type="radio" name="duration" value="120" id="duration-120">
                     <label for="duration-120">120 Days</label>
                 </div>
-                <button id="stake-btn">Stake</button>
-                <div class="stake-list"></div>
-            </section>
+                <button id="stake-confirm-btn">Confirm Stake</button>
+            </div>
+        </div>
 
-            <!-- Conversion Section -->
-            <section id="conversion-section" class="conversion-section">
-                <h2>CONVERT xCIS TO CIS</h2>
-                <input id="convert-input" type="number" placeholder="Enter xCIS Amount to Convert">
-                <button id="convert-btn">Convert</button>
-            </section>
-        </main>
+        <!-- Modal for Conversion -->
+        <div id="conversion-modal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" id="close-conversion">&times;</span>
+                <h2>Convert xCIS to CIS</h2>
+                <input id="convert-input" type="number" placeholder="Enter xCIS Amount">
+                <button id="convert-confirm-btn">Confirm Convert</button>
+            </div>
+        </div>
     </div>
     <script src="script.js"></script>
     <script src="walletConnect.js"></script>
