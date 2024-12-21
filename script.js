@@ -1,111 +1,106 @@
-// Load user data from localStorage
-function getUserData() {
-    return JSON.parse(localStorage.getItem('userData')) || { xCIS: 100, CIS: 0 }; // Default balance
-}
+document.addEventListener('DOMContentLoaded', () => {
+    // User Data
+    let userData = JSON.parse(localStorage.getItem('userData')) || { xCIS: 100, CIS: 0 };
 
-// Save user data to localStorage
-function saveUserData(userData) {
-    localStorage.setItem('userData', JSON.stringify(userData));
-}
+    // Update Balances
+    function updateBalanceDisplay() {
+        document.querySelector('.xcis-balance').textContent = `xCIS: ${userData.xCIS}`;
+        document.querySelector('.cis-balance').textContent = `CIS: ${userData.CIS}`;
+    }
 
-// Initialize user data
-let userData = getUserData();
+    // Save Data
+    function saveUserData() {
+        localStorage.setItem('userData', JSON.stringify(userData));
+    }
 
-// Update balance display
-function updateBalanceDisplay() {
-    document.querySelector('.xcis-balance').textContent = `xCIS: ${userData.xCIS}`;
-    document.querySelector('.cis-balance').textContent = `CIS: ${userData.CIS}`;
-}
-
-// Staking system
-function setupStakingSystem() {
-    const stakeBtn = document.querySelector('#stake-btn');
-    const stakeInput = document.querySelector('#stake-input');
-    const durationRadios = document.querySelectorAll('input[name="duration"]');
-    const stakeList = document.querySelector('.stake-list');
-
-    const rewardMultipliers = { 30: 1.3, 60: 1.6, 90: 1.9, 120: 2.2 }; // Duration in days
-
-    stakeBtn.addEventListener('click', () => {
-        const stakeAmount = parseFloat(stakeInput.value);
-        const selectedDuration = Array.from(durationRadios).find(radio => radio.checked)?.value;
-
-        if (!stakeAmount || stakeAmount <= 0) {
-            alert('Please enter a valid xCIS amount.');
+    // Wallet Connect
+    document.querySelector('#wallet-connect-btn').addEventListener('click', async () => {
+        if (typeof window.ethereum === 'undefined') {
+            alert('MetaMask not installed!');
             return;
         }
 
-        if (!selectedDuration) {
-            alert('Please select a staking duration.');
+        try {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            const walletAddress = accounts[0];
+            document.querySelector('.wallet-address').textContent = `Wallet: ${walletAddress}`;
+            alert(`Wallet Connected: ${walletAddress}`);
+        } catch (error) {
+            console.error(error);
+            alert('Failed to connect wallet.');
+        }
+    });
+
+    // Staking System
+    document.querySelector('#stake-btn').addEventListener('click', () => {
+        const stakeAmount = parseFloat(document.querySelector('#stake-input').value);
+        const duration = document.querySelector('input[name="duration"]:checked')?.value;
+
+        if (!stakeAmount || stakeAmount <= 0) {
+            alert('Enter a valid xCIS amount.');
+            return;
+        }
+
+        if (!duration) {
+            alert('Select a staking duration.');
             return;
         }
 
         if (stakeAmount > userData.xCIS) {
-            alert('Insufficient xCIS balance.');
+            alert('Insufficient balance.');
             return;
         }
 
-        // Update user balance and calculate rewards
+        const rewardMultiplier = { 30: 1.3, 60: 1.6, 90: 1.9, 120: 2.2 };
+        const reward = Math.round(stakeAmount * rewardMultiplier[duration]);
+
         userData.xCIS -= stakeAmount;
-        const reward = Math.round(stakeAmount * rewardMultipliers[selectedDuration]);
-        saveUserData(userData);
+        saveUserData();
         updateBalanceDisplay();
 
-        // Add stake entry
+        const stakeList = document.querySelector('.stake-list');
         const stakeItem = document.createElement('div');
-        stakeItem.classList.add('stake-item');
         stakeItem.innerHTML = `
-            <p>${stakeAmount} xCIS - ${selectedDuration} Days (Reward: ${reward} xCIS)</p>
+            <p>${stakeAmount} xCIS for ${duration} days (Reward: ${reward} xCIS)</p>
             <button class="claim-btn">Claim</button>
         `;
         stakeList.appendChild(stakeItem);
 
-        // Claim functionality
         stakeItem.querySelector('.claim-btn').addEventListener('click', () => {
             userData.xCIS += reward;
-            saveUserData(userData);
+            saveUserData();
             updateBalanceDisplay();
             stakeList.removeChild(stakeItem);
-            alert(`Claimed ${reward} xCIS successfully.`);
+            alert(`Claimed ${reward} xCIS!`);
         });
 
-        alert(`Staked ${stakeAmount} xCIS for ${selectedDuration} days. Potential reward: ${reward} xCIS.`);
+        alert(`Staked ${stakeAmount} xCIS for ${duration} days. Reward: ${reward} xCIS.`);
     });
-}
 
-// Point conversion system
-function setupConversionSystem() {
-    const convertBtn = document.querySelector('#convert-btn');
-    const convertInput = document.querySelector('#convert-input');
-    const conversionRate = 10; // Example: 10 xCIS = 1 CIS
-
-    convertBtn.addEventListener('click', () => {
-        const convertAmount = parseFloat(convertInput.value);
+    // Conversion System
+    document.querySelector('#convert-btn').addEventListener('click', () => {
+        const convertAmount = parseFloat(document.querySelector('#convert-input').value);
+        const conversionRate = 10;
 
         if (!convertAmount || convertAmount <= 0) {
-            alert('Please enter a valid xCIS amount.');
+            alert('Enter a valid xCIS amount.');
             return;
         }
 
         if (convertAmount > userData.xCIS) {
-            alert('Insufficient xCIS balance.');
+            alert('Insufficient balance.');
             return;
         }
 
-        // Perform conversion
         const convertedCIS = Math.floor(convertAmount / conversionRate);
         userData.xCIS -= convertAmount;
         userData.CIS += convertedCIS;
-        saveUserData(userData);
+        saveUserData();
         updateBalanceDisplay();
 
         alert(`Converted ${convertAmount} xCIS to ${convertedCIS} CIS.`);
     });
-}
 
-// Initialize everything
-document.addEventListener('DOMContentLoaded', () => {
+    // Initialize Display
     updateBalanceDisplay();
-    setupStakingSystem();
-    setupConversionSystem();
 });
